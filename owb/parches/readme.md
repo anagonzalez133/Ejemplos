@@ -32,6 +32,7 @@ Al cabo de unos segundos cambiará el prompt de nuestra ventana de comandos por 
    La doble barra \\ en la ruta es necesaria porque el carácter \ es un carácter de escape en TCL.
 
    Al cargar las constantes ya se define por defecto el nombre de un fichero donde escribir los mensajes de log, aunque luego al ejecutar los procedimientos se suele redefinir el fichero. Si la ruta indicada por la constante k_ruta contiene algún error (el script la crea si no existe) se producirá un error en la ejecución de este comando.
+   
 5. A continuación cargar los procedimientos base:
    source D:\\OMBPLUS\\procedimientos_base.tcl
 6. Y por último cargar los procedimientos propios de la instalación de parches de OWB:
