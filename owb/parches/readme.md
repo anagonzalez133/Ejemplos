@@ -47,28 +47,41 @@ Al cabo de unos segundos cambiará el prompt de nuestra ventana de comandos por 
 Para la instalación de los parches es necesario generar una serie de ficheros con nombres determinados por el proyecto de OWB y el nombre de la colección exportada, por lo que conviene utilizar el procedimiento de exportación de la colección incluido en los procedimientos de instalación.
 ## Uso del procedimiento
 Ajustar las constantes en carga_constantes.tcl, abrir la ventana de comandos, lanzar el OMB Plus y cargar los scripts según el procedimiento descrito en Cómo utilizar los scripts:
+
 set ORACLE_HOME=C:\oracle\product\OWB11203
+
 call C:\oracle\product\OWB11203\owb\bin\win32\OMBPlus.bat
+
 source D:\\OMBPLUS\\carga_constantes.tcl
+
 source D:\\OMBPLUS\\procedimientos_base.tcl
+
 source D:\\OMBPLUS\\procedimientos_instalaciones.tcl
+
 append p_ruta_omblog $k_ruta temp.log
+
 set OMBLOG $p_ruta_omblog
 
 A continuación llamar al procedimiento de exportación de una colección:
+
 pr_exporta_coleccion PROYECTO COLECCION "RUTA"
 
 Donde PROYECTO hace referencia al proyecto de OWB donde se ubica la colección, COLECCION es el nombre de la colección a exportar, que debe existir ya en el OWB, el procedimiento no la crea, y RUTA hace referencia a la ruta donde dejar los log y los ficheros generados por el procedimiento de exportación, y debe tener el formato D:\\mi_directorio\\. Si la ruta no contiene espacios en blanco, las dobles comillas no son necesarias.
 
 Si en el fichero de carga_constantes tenemos guardada la constante k_proyecto con el nombre del proyecto de nuestro entorno y utilizamos la constante k_ruta del fichero de carga_constantes para dejar los ficheros de la exportación, la forma de invocar a este procedimiento es:
+
 pr_exporta_coleccion $k_proyecto mi_coleccion "$k_ruta"
 ## Descripción del procedimiento
 En primer lugar, este procedimiento define un nuevo fichero de log para la exportación con el formato $k_ruta/ejecucion_YYMMDD_HHMISS.log (se utiliza la constante k_ruta definida en procedimientos_base.tcl para el fichero, aunque al procedimiento se le haya invocado con otra ruta).
 
 A continuación crea (si no existía ya) el subdirectorio pase en el directorio RUTA con que se ha invocado el procedimiento. Dentro de este directorio es donde va a situar los ficheros resultado de la exportación:
+
 PROYECTO_mapeos_coleccion_COLECCION.lst
+
 PROYECTO_pflow_coleccion_COLECCION.lst
+
 PROYECTO_objetos_coleccion_COLECCION.lst
+
 PROYECTO_COLECCION.mdl
 
 Cada vez que se ejecuta este procedimiento estos ficheros se borran si ya existían y se vuelven a crear vacíos, rellenándolos el procedimiento durante su ejecución.
@@ -80,8 +93,8 @@ Si se trata de un process flow, lo graba en el fichero PROYECTO_pflow_coleccion_
 Si el objeto es desplegable, lo graba en fichero PROYECTO_objetos_coleccion_COLECCION.lst con el listado de objetos a desplegar cuando se instala el parche
 
 La casuística para determinar si un objeto es desplegable es la siguiente:
-Si el objeto pertenece a un módulo cuyo nombre incluye el literal OLTP -> No es desplegable
-Si el objeto es un procedimiento, función o TABLE_FUNCTION que pertenece a un paquete de base de datos, lo que hay que determinar si es desplegable o no es el paquete de base de datos, si el paquete es desplegable, es el que se graba en el fichero de objetos a desplegar.
+1. Si el objeto pertenece a un módulo cuyo nombre incluye el literal OLTP -> No es desplegable
+2. Si el objeto es un procedimiento, función o TABLE_FUNCTION que pertenece a un paquete de base de datos, lo que hay que determinar si es desplegable o no es el paquete de base de datos, si el paquete es desplegable, es el que se graba en el fichero de objetos a desplegar.
 
 Si el objeto es un process flow, lo que se despliega es el paquete de process flow, por tanto es el paquete lo que hay que determinar si es desplegable o no y lo que se graba en el fichero de objetos
 Para el resto de objetos, se mira directamente la propiedad desplegable del objeto.
@@ -90,10 +103,13 @@ Una vez realizado el tratamiento del contenido de la colección se procede a exp
 
 Si todo ha ido bien, se procedimiento termina desconectándose del OWB, así como en cualquier momento que se produzca un error controlado durante el proceso.
 Si se produce un error no controlado, es posible que el procedimiento termine sin realizar la desconexión del repositorio del OWB, con lo que si se intenta volver a lanzar este procedimiento u otro  se producirá un error al intentar conectarse a un repositorio de OWB estando ya conectado. Las órdenes a lanzar para salir del repositorio de OWB sin grabar cambios realizados son:
+
 OMBROLLBACK
+
 OMBDISCONNECT
 
 Aunque nos hayamos desconectado del repositorio de OWB, seguiremos ejecutando OMB Plus. Si además queremos salir de OMB Plus el siguiente comando a lanzar es:
+
 exit
 
 ## Tratamiento de los ficheros tras la exportación
@@ -108,24 +124,37 @@ d) Al igual que en los casos anteriores, hay que eliminar la línea vacía al fi
 # Uso de los scripts. Procedimiento de instalación de parches
 ## Introducción
 Para la instalación de los parches es necesario disponer de una serie de ficheros con nombres determinados por el proyecto de OWB y el nombre de la colección exportada, por lo que conviene haber generado estos ficheros con el procedimiento de exportación de la colección incluido en los procedimientos de instalación. Los ficheros necesarios para la instalación del parche son:
+
 PROYECTO_mapeos_coleccion_COLECCION.lst
+
 PROYECTO_pflow_coleccion_COLECCION.lst
+
 PROYECTO_objetos_coleccion_COLECCION.lst
+
 PROYECTO_COLECCION.mdl
+
 Los ficheros .lst son necesarios aunque estén vacíos.
 ## Uso del procedimiento
 Ajustar las constantes en carga_constantes.tcl, abrir la ventana de comandos, lanzar el OMB Plus y cargar los scripts según el procedimiento descrito en Cómo utilizar los scripts:
+
 set ORACLE_HOME=C:\oracle\product\OWB11203
+
 call C:\oracle\product\OWB11203\owb\bin\win32\OMBPlus.bat
+
 source D:\\OMBPLUS\\carga_constantes.tcl
+
 source D:\\OMBPLUS\\procedimientos_base.tcl
+
 source D:\\OMBPLUS\\procedimientos_instalaciones.tcl
+
 append p_ruta_omblog $k_ruta temp.log
+
 set OMBLOG $p_ruta_omblog
 
 El procedimiento de instalación del parche no realiza una exportación completa del proyecto antes de realizar la instalación. Si es necesario hacer un backup completo del proyecto antes de instalar, consultar el anexo...
 
 A continuación llamar al procedimiento de instalación de una colección:
+
 pr_instala_parche PROYECTO COLECCION "RUTA"
 
 Donde PROYECTO hace referencia al proyecto de OWB donde se ubica la colección, COLECCION es el nombre de la colección a instalar y RUTA hace referencia a la ruta donde se encuentran los ficheros necesarios para la instalación, y debe tener el formato D:\\mi_directorio\\. Si la ruta no contiene espacios en blanco, las dobles comillas no son necesarias.
