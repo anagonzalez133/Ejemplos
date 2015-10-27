@@ -1,0 +1,119 @@
+set feedback off
+set HEADING off
+set arraysize 1
+set echo off
+SET PAGESIZE 3000
+SET LINE 999
+SET TRIM ON
+SET TRIMS ON
+
+prompt
+prompt El SIGUIENTE SCRIPT HA DE LANZARSE CON EL PROPIETARIO DEL OWB, EN VERSION 9 OWB9I, EN 10G OWB102
+prompt
+prompt
+prompt RECONCILIANDO ACADEMICO
+prompt
+set TERMOUT off
+SPOOL C:\RECONCILIA_ACADEMICO.TXT
+-- Reconcilia Academico
+select 'OMBCC '||''''||'/'||'''' FROM DUAL
+UNION ALL
+SELECT 'OMBLIST PROJECTS' FROM DUAL
+UNION ALL
+select 'OMBCC '||''''||'UXXIDW'||'''' FROM DUAL
+UNION ALL
+select 'OMBCC '||''''||'UXXIAC_ODS'||'''' FROM DUAL
+UNION ALL
+SELECT 'OMBRECONCILE TABLE ''/UXXIDW/UXXIAC_OLTP/'||c.DATA_ENTITY_NAME||
+       ''' TO MAPPING '''||c.MAP_NAME||'''  OPERATOR '''||c.MAP_COMPONENT_NAME||
+       ''' USE (RECONCILE_STRATEGY ''REPLACE'', MATCHING_STRATEGY ''MATCH_BY_OBJECT_NAME'')'
+from all_iv_xform_maps m,
+     all_iv_xform_map_components c
+where m.MAP_ID = c.MAP_ID
+and  NOT (c.MAP_COMPONENT_NAME like 'TOH%'
+    OR c.MAP_COMPONENT_NAME like 'TOA%'
+    OR c.MAP_COMPONENT_NAME like 'TOI%')
+AND OPERATOR_TYPE = 'Table'
+and  (c.MAP_NAME like '%TOH_U21%'
+OR c.MAP_NAME like '%TOA_U21%')
+UNION ALL
+select 'OMBCOMMIT '||chr(13) FROM DUAL
+UNION ALL
+select 'OMBCOMMIT ' FROM DUAL;
+
+SPOOL OFF
+set TERMOUT ON
+prompt
+prompt RECONCILIANDO Recursos Humanos
+prompt
+set TERMOUT off
+SPOOL C:\RECONCILIA_RECURSOSHUMANOS.TXT
+-- Reconcilia Recursos humanos
+select 'OMBCC '||''''||'/'||'''' FROM DUAL
+UNION ALL
+SELECT 'OMBLIST PROJECTS' FROM DUAL
+UNION ALL
+select 'OMBCC '||''''||'UXXIDW'||'''' FROM DUAL
+UNION ALL
+select 'OMBCC '||''''||'UXXIRRHH_ODS'||'''' FROM DUAL
+UNION ALL
+SELECT 'OMBRECONCILE TABLE ''/UXXIDW/UXXIRRHH_OLTP/'||c.DATA_ENTITY_NAME||
+       ''' TO MAPPING '''||c.MAP_NAME||'''  OPERATOR '''||c.MAP_COMPONENT_NAME||
+       ''' USE (RECONCILE_STRATEGY ''REPLACE'', MATCHING_STRATEGY ''MATCH_BY_OBJECT_NAME'')'
+from all_iv_xform_maps m,
+     all_iv_xform_map_components c
+where m.MAP_ID = c.MAP_ID
+and  NOT (c.MAP_COMPONENT_NAME like 'TOH%'
+    OR c.MAP_COMPONENT_NAME like 'TOA%'
+    OR c.MAP_COMPONENT_NAME like 'TOI%')
+AND OPERATOR_TYPE = 'Table'
+and  (c.MAP_NAME like '%TOH_HOM%'
+OR c.MAP_NAME like '%TOA_HOM%')
+UNION ALL
+select 'OMBCOMMIT '||chr(13) FROM DUAL
+UNION ALL
+select 'OMBCOMMIT ' FROM DUAL;
+SPOOL OFF
+set TERMOUT ON
+prompt
+prompt RECONCILIANDO Sorolla
+prompt
+set TERMOUT off
+SPOOL C:\RECONCILIA_ECONOMICO.TXT
+-- Reconcilia Recursos humanos
+select 'OMBCC '||''''||'/'||'''' FROM DUAL
+UNION ALL
+SELECT 'OMBLIST PROJECTS' FROM DUAL
+UNION ALL
+select 'OMBCC '||''''||'UXXIDW'||'''' FROM DUAL
+UNION ALL
+select 'OMBCC '||''''||'UXXIEC_ODS'||'''' FROM DUAL
+UNION ALL
+SELECT 'OMBRECONCILE TABLE ''/UXXIDW/UXXIEC_OLTP/'||c.DATA_ENTITY_NAME||
+       ''' TO MAPPING '''||c.MAP_NAME||'''  OPERATOR '''||c.MAP_COMPONENT_NAME||
+       ''' USE (RECONCILE_STRATEGY ''REPLACE'', MATCHING_STRATEGY ''MATCH_BY_OBJECT_NAME'')'
+from all_iv_xform_maps m,
+     all_iv_xform_map_components c
+where m.MAP_ID = c.MAP_ID
+and  NOT (c.MAP_COMPONENT_NAME like 'TOH%'
+    OR c.MAP_COMPONENT_NAME like 'TOA%'
+    OR c.MAP_COMPONENT_NAME like 'TOI%')
+AND OPERATOR_TYPE = 'Table'
+and  (c.MAP_NAME like '%TOH_SOR%'
+OR c.MAP_NAME like '%TOA_SOR%')
+UNION ALL
+select 'OMBCOMMIT '||chr(13) FROM DUAL
+UNION ALL
+select 'OMBCOMMIT ' FROM DUAL;
+SPOOL OFF
+set feedback ON
+set TERMOUT ON
+prompt
+prompt SCRIPT GENERADOS
+prompt
+set echo ON
+set HEADING on
+set feedback on
+
+--DISCONNECT;
+
