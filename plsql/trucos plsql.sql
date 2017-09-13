@@ -95,3 +95,22 @@ order by object_name, policy_name
 select * from user_policies
 order by object_name, policy_name
 
+/*********************************************************
+* Búsqueda y creación de trabajos programados en la BBDD *
+**********************************************************/
+SELECT * FROM all_scheduler_jobs
+
+BEGIN
+  DBMS_SCHEDULER.CREATE_JOB (
+   job_name           =>  'TUTORES_ASIGNACION',
+   job_type           =>  'PLSQL_BLOCK',
+   job_action         =>  'BEGIN pudm$tutores_udima.p_asignacionmasivadetutor; END;',
+   repeat_interval    =>  'FREQ=DAILY;BYHOUR=19;BYMINUTE=5',
+   comments           =>  'Ejecución diaria del proceso de desasignación/asignación de tutores');
+  DBMS_SCHEDULER.ENABLE ('TUTORES_ASIGNACION');
+END;
+
+BEGIN
+  DBMS_SCHEDULER.SET_ATTRIBUTE (name => 'TUTORES_ASIGNACION', attribute => 'repeat_interval', value => 'FREQ=DAILY;BYHOUR=01');
+END;
+
