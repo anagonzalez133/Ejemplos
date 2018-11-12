@@ -30,6 +30,48 @@ ORDER BY log_date DESC
 
 -- Con el campo errors detectamos el paso fallado, y en el campo log_field aparece el error
 
+/* La tabla tlog_channels se relaciona con el resto de tablas por el CHANNEL_ID, excepto en el caso de la tlog_job_entry
+no ocurre así por un bug https://jira.pentaho.com/browse/PDI-16515  en lugar de
+la unión directa usar la siguiente query */
+select CHANNEL.CHANNEL_ID CHANNEL_ID_CORRECTED, CHANNEL.OBJECT_NAME channel_object_name
+, JOBENTRY.*
+from tlog_job_entry JOBENTRY
+inner join tlog_job JOB
+on JOBENTRY.ID_BATCH = JOB.ID_JOB
+/* Las limitaciones por jobname y fecha no funcionan, dan timeout, hay que limitar por channel_id, obteniendo el que nos interese de la consulta de abajo */
+/* and JOB.JOBNAME = 'JB_ALL_HIST_MATRICULA'
+and JOB.LOGDATE >= STR_TO_DATE('20181001', '%Y%m%d') */
+inner join tlog_channels CHANNEL
+on JOB.CHANNEL_ID = CHANNEL.PARENT_CHANNEL_ID
+ and CHANNEL.OBJECT_NAME = JOBENTRY.STEPNAME
+WHERE JOB.CHANNEL_ID = '73a9e95a-5ca1-4393-b04d-89208fc0eaf9'
+
+
+select JOB.CHANNEL_ID JOB_CHANNEL_ID, JOBENTRY.ID_BATCH, JOBENTRY.CHANNEL_ID WRONG_JOBENTRY_CHANNEL_ID, JOBENTRY.LOG_DATE,
+       JOBENTRY.TRANSNAME, JOBENTRY.STEPNAME, JOBENTRY.LINES_READ, JOBENTRY.LINES_WRITTEN,
+       JOBENTRY.LINES_UPDATED, JOBENTRY.LINES_INPUT, JOBENTRY.LINES_OUTPUT, JOBENTRY.ERRORS,
+       JOBENTRY.RESULT, JOBENTRY.NR_RESULT_ROWS
+from tlog_job_entry JOBENTRY
+inner join tlog_job JOB
+on JOBENTRY.ID_BATCH = JOB.ID_JOB
+WHERE JOBENTRY.transname = 'JB_ALL_HIST_MATRICULA'
+
+select JOB.CHANNEL_ID JOB_CHANNEL_ID, JOBENTRY.ID_BATCH, JOBENTRY.CHANNEL_ID WRONG_JOBENTRY_CHANNEL_ID, JOBENTRY.LOG_DATE,
+       JOBENTRY.TRANSNAME, JOBENTRY.STEPNAME, JOBENTRY.LINES_READ, JOBENTRY.LINES_WRITTEN,
+       JOBENTRY.LINES_UPDATED, JOBENTRY.LINES_INPUT, JOBENTRY.LINES_OUTPUT, JOBENTRY.ERRORS,
+       JOBENTRY.RESULT, JOBENTRY.NR_RESULT_ROWS
+from tlog_job_entry JOBENTRY
+inner join tlog_job JOB
+on JOBENTRY.ID_BATCH = JOB.ID_JOB
+WHERE JOBENTRY.transname = 'JB_ALL_HIST_MATRICULA'
+-- and JOB.LOGDATE >= STR_TO_DATE('20181001', '%Y%m%d')
+
+
+
+
+
+
+
 
 SELECT mat.datini, mat.datfin, mat.plan_estudios_sk, pl.plan_estudios_cod, pl.plan_estudios_de,
        mat.exp_numord, mat.alu_dnialu, mat.persona_sk, mat.datalu
@@ -65,3 +107,14 @@ CREATE TABLE xxx ()
 COMMENT ''
 ROW_FORMAT = DYNAMIC;
 
+
+
+-- Para cambiar el character set de una base de datos:
+-- 1) Exportar la base de datos a un fichero sql especificando la orden de borrar la base de datos:
+mysqldump -uusername -ppassword -c -e --default-character-set=utf8mb4 --single-transaction --skip-set-charset --add-drop-database -B dbname > dump.sql
+-- 2) Editar con vi el fichero sql generado, haciendo el cambio del collate y el character set:
+-- Es importante hacer la sustitución primero del COLLATE y luego del CHARSET, para evitar modificar el COLLATE parcialmente
+:%s/latin1_spanish_ci/utf8mb4_general_ci/
+:%s/latin1/utf8mb4/
+-- 3) Volver a crear la base de datos con el fichero modificado:
+mysql -uusername -ppassword < dump.sql
